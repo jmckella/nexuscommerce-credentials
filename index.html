@@ -158,22 +158,6 @@
       font-size: 14px;
       color: #166534;
     }
-    .nx-advanced-toggle {
-      display: flex;
-      align-items: center;
-      margin: 20px 0;
-      font-size: 14px;
-      font-weight: 500;
-      color: #555;
-      cursor: pointer;
-    }
-    .nx-advanced-toggle svg {
-      margin-right: 8px;
-      transition: transform 0.2s ease;
-    }
-    .nx-advanced-toggle.open svg {
-      transform: rotate(90deg);
-    }
     /* Responsive adjustment */
     @media (max-width: 600px) {
       .container {
@@ -325,18 +309,7 @@
           </div>
         </div>
         
-        <!-- Advanced Options Toggle -->
-        <div class="nx-advanced-toggle" id="advanced-toggle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-          Advanced options
-        </div>
-        
-        <!-- Advanced Options (hidden by default) -->
-        <div id="advanced-options" style="display:none;">
-          <!-- Add advanced options here if needed -->
-        </div>
+        <!-- Advanced options section removed -->
         
         <!-- Common Form Elements -->
         <div class="nx-checkbox-group">
@@ -416,14 +389,7 @@
       }
     }
     
-    // Toggle advanced options
-    document.getElementById('advanced-toggle').addEventListener('click', function() {
-      const advancedOptions = document.getElementById('advanced-options');
-      const isOpen = advancedOptions.style.display === 'block';
-      
-      advancedOptions.style.display = isOpen ? 'none' : 'block';
-      this.className = isOpen ? 'nx-advanced-toggle' : 'nx-advanced-toggle open';
-    });
+    // Advanced options toggle code removed
     
     // Get URL parameters
     function getUrlParams() {
