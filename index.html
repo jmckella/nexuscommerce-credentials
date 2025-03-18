@@ -341,8 +341,8 @@
         document.getElementById("return-link").style.display = "block";
         
         // In production, you would send data to your API:
-        /*
-        fetch('https://your-api-endpoint.com/credentials', {
+        
+        fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -361,10 +361,16 @@
           return response.json();
         }).then(data => {
           // Success handling
+document.getElementById("success-text").textContent = 
+  "Your " + (activeTab === 'shopify' ? 'Shopify' : 'WooCommerce') + " credentials have been securely stored.";
+document.getElementById("success-message").style.display = "flex";
+document.getElementById("return-link").style.display = "block";
         }).catch(error => {
           // Error handling
+console.error('Error:', error);
+alert("Error storing credentials: " + error.message);
         });
-        */
+        
       }, 1500);
     });
   </script>
