@@ -34,33 +34,35 @@
       align-items: center;
       margin-bottom: 8px;
     }
-    .nx-tabs {
-      display: flex;
-      border-bottom: 1px solid #eee;
-    }
-    .nx-tab {
-      padding: 12px 20px;
-      cursor: pointer;
-      font-size: 14px;
+    .nx-platform-badge {
+      background: #22c55e;
+      color: white;
+      font-size: 12px;
       font-weight: 500;
-      transition: all 0.2s ease;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-left: 10px;
     }
-    .nx-tab.active {
-      border-bottom: 2px solid #22c55e;
-      background: white;
+    .nx-future-platforms {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
     }
-    .nx-tab.inactive {
-      background: #f5f5f5;
-      color: #666;
+    .nx-future-platforms svg {
+      margin-right: 5px;
     }
     .nx-body {
       padding: 24px;
     }
     .nx-form-group {
       margin-bottom: 20px;
+      position: relative;
     }
     .nx-label {
-      display: block;
+      display: flex;
+      align-items: center;
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 8px;
@@ -158,11 +160,125 @@
       font-size: 14px;
       color: #166534;
     }
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: bold;
+      margin-left: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .help-icon:hover {
+      background: #cbd5e1;
+    }
+    .tooltip-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 5;
+    }
+    .tooltip {
+      position: absolute;
+      z-index: 10;
+      width: 320px;
+      max-height: 380px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      padding: 16px;
+      font-size: 13px;
+      color: #475569;
+      display: none;
+      border: 1px solid #e2e8f0;
+    }
+    .tooltip.visible {
+      display: block;
+    }
+    /* Position tooltips more strategically */
+    .store-url-help .tooltip {
+      top: 100%;
+      left: 0;
+      margin-top: 8px;
+    }
+    .api-key-help .tooltip,
+    .api-password-help .tooltip {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      position: fixed;
+    }
+    .email-help .tooltip {
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+    }
+    .tooltip-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #22c55e;
+      font-size: 15px;
+      padding-right: 20px;
+    }
+    .tooltip-steps {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .tooltip-steps li {
+      margin-bottom: 8px;
+    }
+    .tooltip-steps li:last-child {
+      margin-bottom: 0;
+    }
+    .tooltip-support {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .tooltip-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    .tooltip-close:hover {
+      background: #e2e8f0;
+      color: #475569;
+    }
     /* Responsive adjustment */
     @media (max-width: 600px) {
       .container {
         margin: 20px auto;
         padding: 0 20px;
+      }
+      .tooltip {
+        width: 280px;
+        max-width: 90vw;
       }
     }
   </style>
@@ -178,14 +294,17 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
           <h2 style="margin:0;font-size:20px;">Provide Access to Your Store</h2>
+          <div class="nx-platform-badge">Shopify</div>
         </div>
         <p style="margin:5px 0 0;font-size:14px;color:#666;">Your credentials are encrypted and securely stored using industry best practices.</p>
-      </div>
-      
-      <!-- Tabs -->
-      <div class="nx-tabs">
-        <div id="shopify-tab" class="nx-tab active">Shopify</div>
-        <div id="woo-tab" class="nx-tab inactive">WooCommerce</div>
+        <div class="nx-future-platforms">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Salesforce Commerce Cloud, BigCommerce, Adobe Commerce, and other enterprise platforms coming soon
+        </div>
       </div>
       
       <!-- Form Body -->
@@ -201,7 +320,7 @@
               </svg>
             </span>
             <span class="nx-alert-text">
-              Nexuscommerce uses your credentials to securely access your store data for analysis and optimization. 
+              Nexuscommerce uses your credentials to securely access your Shopify store data for analysis and optimization. 
               We recommend using dedicated API credentials rather than your admin login.
             </span>
           </div>
@@ -214,33 +333,96 @@
             </div>
             <div class="nx-radio-option">
               <input type="radio" id="shopify-admin" name="shopify-auth-type" class="nx-radio" value="admin">
-              <label for="shopify-admin" class="nx-radio-label">Use admin login (not recommended)</label>
+              <label for="shopify-admin" class="nx-radio-label">Use admin login (optional for our team to assist you with site edits)</label>
             </div>
           </div>
           
-          <div class="nx-form-group">
-            <label class="nx-label">Store URL</label>
+          <div class="nx-form-group store-url-help">
+            <label class="nx-label">
+              Store URL
+              <div class="help-icon" data-tooltip="shopify-url-tooltip">?</div>
+            </label>
             <input type="text" id="shopify-url" class="nx-input" placeholder="yourstore.myshopify.com">
+            <div id="shopify-url-tooltip" class="tooltip">
+              <div class="tooltip-title">Finding Your Shopify Store URL</div>
+              <button class="tooltip-close">✕</button>
+              <ol class="tooltip-steps">
+                <li>Your store URL is your Shopify domain</li>
+                <li>It typically follows the format: <strong>yourstore.myshopify.com</strong></li>
+                <li>You can find this in your browser address bar when logged into your Shopify admin</li>
+              </ol>
+              <div class="tooltip-support">
+                If you need additional assistance, send us a message in your NexusCommerce portal or email us at contact@nexuscommerce.co.
+              </div>
+            </div>
           </div>
           
           <!-- API credentials fields -->
           <div id="shopify-api-fields">
-            <div class="nx-form-group">
-              <label class="nx-label">API Key</label>
+            <div class="nx-form-group api-key-help">
+              <label class="nx-label">
+                API Key
+                <div class="help-icon" data-tooltip="shopify-key-tooltip">?</div>
+              </label>
               <input type="text" id="shopify-key" class="nx-input">
+              <div id="shopify-key-tooltip" class="tooltip">
+                <div class="tooltip-title">Finding Your Shopify API Key</div>
+                <button class="tooltip-close">✕</button>
+                <ol class="tooltip-steps">
+                  <li>Log in to your Shopify admin</li>
+                  <li>Go to <strong>Settings</strong> > <strong>Apps and sales channels</strong></li>
+                  <li>Click <strong>Develop apps</strong> > <strong>Create an app</strong></li>
+                  <li>Give your app a name (e.g. "Nexuscommerce")</li>
+                  <li>From the app overview page, click <strong>Configure Admin API scopes</strong></li>
+                  <li>Select the necessary read permissions and Save</li>
+                  <li>Go back to the app overview and click <strong>Install app</strong></li>
+                  <li>After installation, you'll see your API key and API secret key</li>
+                </ol>
+                <div class="tooltip-support">
+                  If you need additional assistance, send us a message in your NexusCommerce portal or email us at contact@nexuscommerce.co.
+                </div>
+              </div>
             </div>
             
-            <div class="nx-form-group">
-              <label class="nx-label">API Password</label>
+            <div class="nx-form-group api-password-help">
+              <label class="nx-label">
+                API Password
+                <div class="help-icon" data-tooltip="shopify-password-tooltip">?</div>
+              </label>
               <input type="password" id="shopify-password" class="nx-input">
+              <div id="shopify-password-tooltip" class="tooltip">
+                <div class="tooltip-title">Finding Your API Password</div>
+                <button class="tooltip-close">✕</button>
+                <ol class="tooltip-steps">
+                  <li>This is also called your "API secret key" or "Admin API access token"</li>
+                  <li>You can find it in the same location as your API key</li>
+                  <li>For security, Shopify only shows this once when you create your API credentials</li>
+                  <li>If you've lost it, you'll need to regenerate a new API password</li>
+                </ol>
+                <div class="tooltip-support">
+                  If you need additional assistance, send us a message in your NexusCommerce portal or email us at contact@nexuscommerce.co.
+                </div>
+              </div>
             </div>
           </div>
           
           <!-- Admin login fields -->
           <div id="shopify-admin-fields" style="display:none;">
-            <div class="nx-form-group">
-              <label class="nx-label">Email Address</label>
+            <div class="nx-form-group email-help">
+              <label class="nx-label">
+                Email Address
+                <div class="help-icon" data-tooltip="shopify-email-tooltip">?</div>
+              </label>
               <input type="email" id="shopify-email" class="nx-input">
+              <div id="shopify-email-tooltip" class="tooltip">
+                <div class="tooltip-title">Shopify Admin Email</div>
+                <button class="tooltip-close">✕</button>
+                <p>Enter the email address you use to log in to your Shopify admin dashboard.</p>
+                <p><strong>Note:</strong> Providing admin login is optional and only needed if you'd like our team to assist with store customizations or content updates.</p>
+                <div class="tooltip-support">
+                  If you need additional assistance, send us a message in your NexusCommerce portal or email us at contact@nexuscommerce.co.
+                </div>
+              </div>
             </div>
             
             <div class="nx-form-group">
@@ -249,67 +431,6 @@
             </div>
           </div>
         </div>
-        
-        <!-- WooCommerce Form -->
-        <div id="woo-form" style="display:none;">
-          <div class="nx-alert">
-            <span class="nx-alert-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-            </span>
-            <span class="nx-alert-text">
-              For WooCommerce stores, we recommend creating dedicated API keys with read-only access.
-            </span>
-          </div>
-          
-          <!-- Credential Type Selection -->
-          <div class="nx-radio-group">
-            <div class="nx-radio-option">
-              <input type="radio" id="woo-api" name="woo-auth-type" class="nx-radio" value="api" checked>
-              <label for="woo-api" class="nx-radio-label">Use API credentials (recommended)</label>
-            </div>
-            <div class="nx-radio-option">
-              <input type="radio" id="woo-admin" name="woo-auth-type" class="nx-radio" value="admin">
-              <label for="woo-admin" class="nx-radio-label">Use admin login (not recommended)</label>
-            </div>
-          </div>
-          
-          <div class="nx-form-group">
-            <label class="nx-label">Store URL</label>
-            <input type="text" id="woo-url" class="nx-input" placeholder="https://yourdomain.com">
-          </div>
-          
-          <!-- API credentials fields -->
-          <div id="woo-api-fields">
-            <div class="nx-form-group">
-              <label class="nx-label">Consumer Key</label>
-              <input type="text" id="woo-key" class="nx-input">
-            </div>
-            
-            <div class="nx-form-group">
-              <label class="nx-label">Consumer Secret</label>
-              <input type="password" id="woo-secret" class="nx-input">
-            </div>
-          </div>
-          
-          <!-- Admin login fields -->
-          <div id="woo-admin-fields" style="display:none;">
-            <div class="nx-form-group">
-              <label class="nx-label">Username</label>
-              <input type="text" id="woo-username" class="nx-input">
-            </div>
-            
-            <div class="nx-form-group">
-              <label class="nx-label">Password</label>
-              <input type="password" id="woo-admin-password" class="nx-input">
-            </div>
-          </div>
-        </div>
-        
-        <!-- Advanced options section removed -->
         
         <!-- Common Form Elements -->
         <div class="nx-checkbox-group">
@@ -340,56 +461,86 @@
     </div>
   </div>
 
+  <!-- Tooltip overlay for dimming background -->
+  <div class="tooltip-overlay" id="tooltip-overlay"></div>
+
   <script>
-    // Tab switching
-    document.getElementById("shopify-tab").addEventListener("click", function() {
-      switchTab('shopify');
-    });
-    
-    document.getElementById("woo-tab").addEventListener("click", function() {
-      switchTab('woo');
-    });
-    
-    function switchTab(tab) {
-      // Update tabs
-      document.getElementById("shopify-tab").className = tab === 'shopify' ? 'nx-tab active' : 'nx-tab inactive';
-      document.getElementById("woo-tab").className = tab === 'woo' ? 'nx-tab active' : 'nx-tab inactive';
-      
-      // Show/hide forms
-      document.getElementById("shopify-form").style.display = tab === 'shopify' ? 'block' : 'none';
-      document.getElementById("woo-form").style.display = tab === 'woo' ? 'block' : 'none';
-    }
-    
     // Toggle between API and admin login fields
-    document.querySelector('input[name="shopify-auth-type"]').addEventListener('change', function() {
-      toggleAuthFields('shopify');
-    });
-    
     document.querySelectorAll('input[name="shopify-auth-type"]').forEach(radio => {
       radio.addEventListener('change', function() {
-        toggleAuthFields('shopify');
+        toggleAuthFields();
+        closeAllTooltips();
       });
     });
     
-    document.querySelectorAll('input[name="woo-auth-type"]').forEach(radio => {
-      radio.addEventListener('change', function() {
-        toggleAuthFields('woo');
-      });
-    });
-    
-    function toggleAuthFields(platform) {
-      const authType = document.querySelector(`input[name="${platform}-auth-type"]:checked`).value;
+    function toggleAuthFields() {
+      const authType = document.querySelector('input[name="shopify-auth-type"]:checked').value;
       
-      if (platform === 'shopify') {
-        document.getElementById('shopify-api-fields').style.display = authType === 'api' ? 'block' : 'none';
-        document.getElementById('shopify-admin-fields').style.display = authType === 'admin' ? 'block' : 'none';
-      } else {
-        document.getElementById('woo-api-fields').style.display = authType === 'api' ? 'block' : 'none';
-        document.getElementById('woo-admin-fields').style.display = authType === 'admin' ? 'block' : 'none';
-      }
+      document.getElementById('shopify-api-fields').style.display = authType === 'api' ? 'block' : 'none';
+      document.getElementById('shopify-admin-fields').style.display = authType === 'admin' ? 'block' : 'none';
     }
     
-    // Advanced options toggle code removed
+    // Help tooltips functionality
+    const helpIcons = document.querySelectorAll('.help-icon');
+    const tooltipOverlay = document.getElementById('tooltip-overlay');
+    let activeTooltip = null;
+    
+    // Initialize tooltip events
+    helpIcons.forEach(icon => {
+      const tooltipId = icon.getAttribute('data-tooltip');
+      const tooltip = document.getElementById(tooltipId);
+      
+      // Add click event to show tooltip
+      icon.addEventListener('click', function(event) {
+        event.stopPropagation();
+        
+        // Close any other open tooltips first
+        closeAllTooltips();
+        
+        // Show this tooltip
+        tooltip.classList.add('visible');
+        tooltipOverlay.style.display = 'block';
+        activeTooltip = tooltip;
+      });
+      
+      // Add close button functionality
+      if (tooltip) {
+        const closeBtn = tooltip.querySelector('.tooltip-close');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            closeTooltip(tooltip);
+          });
+        }
+      }
+    });
+    
+    // Close when clicking overlay
+    tooltipOverlay.addEventListener('click', function() {
+      closeAllTooltips();
+    });
+    
+    // Close when pressing Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeAllTooltips();
+      }
+    });
+    
+    // Helper functions for tooltips
+    function closeTooltip(tooltip) {
+      tooltip.classList.remove('visible');
+      tooltipOverlay.style.display = 'none';
+      activeTooltip = null;
+    }
+    
+    function closeAllTooltips() {
+      document.querySelectorAll('.tooltip').forEach(tooltip => {
+        tooltip.classList.remove('visible');
+      });
+      tooltipOverlay.style.display = 'none';
+      activeTooltip = null;
+    }
     
     // Get URL parameters
     function getUrlParams() {
@@ -412,9 +563,8 @@
     
     // Handle form submission
     document.getElementById("submit-btn").addEventListener("click", function() {
-      // Get active tab and auth type
-      let activeTab = document.getElementById("shopify-tab").className.includes("active") ? 'shopify' : 'woo';
-      let authType = document.querySelector(`input[name="${activeTab}-auth-type"]:checked`).value;
+      // Get auth type
+      let authType = document.querySelector('input[name="shopify-auth-type"]:checked').value;
       
       // Show loading state
       const button = document.getElementById("submit-btn");
@@ -424,43 +574,27 @@
       
       // Build credentials object based on auth type
       let credentials = {};
-      let storeUrl = document.getElementById(`${activeTab}-url`).value;
+      let storeUrl = document.getElementById("shopify-url").value;
       
       if (authType === 'api') {
-        if (activeTab === 'shopify') {
-          credentials = {
-            type: 'api',
-            apiKey: document.getElementById("shopify-key").value,
-            apiSecret: document.getElementById("shopify-password").value
-          };
-        } else { // WooCommerce
-          credentials = {
-            type: 'api',
-            consumerKey: document.getElementById("woo-key").value,
-            consumerSecret: document.getElementById("woo-secret").value
-          };
-        }
+        credentials = {
+          type: 'api',
+          apiKey: document.getElementById("shopify-key").value,
+          apiSecret: document.getElementById("shopify-password").value
+        };
       } else { // admin login
-        if (activeTab === 'shopify') {
-          credentials = {
-            type: 'admin',
-            email: document.getElementById("shopify-email").value,
-            password: document.getElementById("shopify-admin-password").value
-          };
-        } else { // WooCommerce
-          credentials = {
-            type: 'admin',
-            username: document.getElementById("woo-username").value,
-            password: document.getElementById("woo-admin-password").value
-          };
-        }
+        credentials = {
+          type: 'admin',
+          email: document.getElementById("shopify-email").value,
+          password: document.getElementById("shopify-admin-password").value
+        };
       }
       
       // Simulated API call
       setTimeout(function() {
         // Show success message
         document.getElementById("success-text").textContent = 
-          "Your " + (activeTab === 'shopify' ? 'Shopify' : 'WooCommerce') + " credentials have been securely stored.";
+          "Your Shopify credentials have been securely stored.";
         document.getElementById("success-message").style.display = "flex";
         
         // Reset button
@@ -468,22 +602,12 @@
         button.disabled = false;
         
         // Clear sensitive fields
-        if (activeTab === 'shopify') {
-          if (authType === 'api') {
-            document.getElementById("shopify-key").value = "";
-            document.getElementById("shopify-password").value = "";
-          } else {
-            document.getElementById("shopify-email").value = "";
-            document.getElementById("shopify-admin-password").value = "";
-          }
-        } else { // WooCommerce
-          if (authType === 'api') {
-            document.getElementById("woo-key").value = "";
-            document.getElementById("woo-secret").value = "";
-          } else {
-            document.getElementById("woo-username").value = "";
-            document.getElementById("woo-admin-password").value = "";
-          }
+        if (authType === 'api') {
+          document.getElementById("shopify-key").value = "";
+          document.getElementById("shopify-password").value = "";
+        } else {
+          document.getElementById("shopify-email").value = "";
+          document.getElementById("shopify-admin-password").value = "";
         }
         
         // Show return link
@@ -497,7 +621,7 @@
           },
           body: JSON.stringify({
             customerId: params.customerId,
-            platform: activeTab,
+            platform: 'shopify',
             storeUrl: storeUrl,
             credentials: credentials
           })
@@ -507,7 +631,7 @@
         }).then(data => {
           // Success handling
           document.getElementById("success-text").textContent = 
-            "Your " + (activeTab === 'shopify' ? 'Shopify' : 'WooCommerce') + " credentials have been securely stored.";
+            "Your Shopify credentials have been securely stored.";
           document.getElementById("success-message").style.display = "flex";
           document.getElementById("return-link").style.display = "block";
         }).catch(error => {
