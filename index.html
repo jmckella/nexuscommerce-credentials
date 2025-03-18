@@ -97,6 +97,22 @@
       font-size: 14px;
       color: #92400e;
     }
+    .nx-radio-group {
+      margin-bottom: 20px;
+    }
+    .nx-radio-option {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .nx-radio {
+      margin-right: 10px;
+      margin-top: 3px;
+    }
+    .nx-radio-label {
+      font-size: 14px;
+      font-weight: 500;
+    }
     .nx-checkbox-group {
       display: flex;
       margin: 24px 0;
@@ -141,6 +157,22 @@
     .nx-success-text {
       font-size: 14px;
       color: #166534;
+    }
+    .nx-advanced-toggle {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+    }
+    .nx-advanced-toggle svg {
+      margin-right: 8px;
+      transition: transform 0.2s ease;
+    }
+    .nx-advanced-toggle.open svg {
+      transform: rotate(90deg);
     }
     /* Responsive adjustment */
     @media (max-width: 600px) {
@@ -190,19 +222,47 @@
             </span>
           </div>
           
+          <!-- Credential Type Selection -->
+          <div class="nx-radio-group">
+            <div class="nx-radio-option">
+              <input type="radio" id="shopify-api" name="shopify-auth-type" class="nx-radio" value="api" checked>
+              <label for="shopify-api" class="nx-radio-label">Use API credentials (recommended)</label>
+            </div>
+            <div class="nx-radio-option">
+              <input type="radio" id="shopify-admin" name="shopify-auth-type" class="nx-radio" value="admin">
+              <label for="shopify-admin" class="nx-radio-label">Use admin login (not recommended)</label>
+            </div>
+          </div>
+          
           <div class="nx-form-group">
             <label class="nx-label">Store URL</label>
             <input type="text" id="shopify-url" class="nx-input" placeholder="yourstore.myshopify.com">
           </div>
           
-          <div class="nx-form-group">
-            <label class="nx-label">API Key</label>
-            <input type="text" id="shopify-key" class="nx-input">
+          <!-- API credentials fields -->
+          <div id="shopify-api-fields">
+            <div class="nx-form-group">
+              <label class="nx-label">API Key</label>
+              <input type="text" id="shopify-key" class="nx-input">
+            </div>
+            
+            <div class="nx-form-group">
+              <label class="nx-label">API Password</label>
+              <input type="password" id="shopify-password" class="nx-input">
+            </div>
           </div>
           
-          <div class="nx-form-group">
-            <label class="nx-label">API Password</label>
-            <input type="password" id="shopify-password" class="nx-input">
+          <!-- Admin login fields -->
+          <div id="shopify-admin-fields" style="display:none;">
+            <div class="nx-form-group">
+              <label class="nx-label">Email Address</label>
+              <input type="email" id="shopify-email" class="nx-input">
+            </div>
+            
+            <div class="nx-form-group">
+              <label class="nx-label">Password</label>
+              <input type="password" id="shopify-admin-password" class="nx-input">
+            </div>
           </div>
         </div>
         
@@ -221,20 +281,61 @@
             </span>
           </div>
           
+          <!-- Credential Type Selection -->
+          <div class="nx-radio-group">
+            <div class="nx-radio-option">
+              <input type="radio" id="woo-api" name="woo-auth-type" class="nx-radio" value="api" checked>
+              <label for="woo-api" class="nx-radio-label">Use API credentials (recommended)</label>
+            </div>
+            <div class="nx-radio-option">
+              <input type="radio" id="woo-admin" name="woo-auth-type" class="nx-radio" value="admin">
+              <label for="woo-admin" class="nx-radio-label">Use admin login (not recommended)</label>
+            </div>
+          </div>
+          
           <div class="nx-form-group">
             <label class="nx-label">Store URL</label>
             <input type="text" id="woo-url" class="nx-input" placeholder="https://yourdomain.com">
           </div>
           
-          <div class="nx-form-group">
-            <label class="nx-label">Consumer Key</label>
-            <input type="text" id="woo-key" class="nx-input">
+          <!-- API credentials fields -->
+          <div id="woo-api-fields">
+            <div class="nx-form-group">
+              <label class="nx-label">Consumer Key</label>
+              <input type="text" id="woo-key" class="nx-input">
+            </div>
+            
+            <div class="nx-form-group">
+              <label class="nx-label">Consumer Secret</label>
+              <input type="password" id="woo-secret" class="nx-input">
+            </div>
           </div>
           
-          <div class="nx-form-group">
-            <label class="nx-label">Consumer Secret</label>
-            <input type="password" id="woo-secret" class="nx-input">
+          <!-- Admin login fields -->
+          <div id="woo-admin-fields" style="display:none;">
+            <div class="nx-form-group">
+              <label class="nx-label">Username</label>
+              <input type="text" id="woo-username" class="nx-input">
+            </div>
+            
+            <div class="nx-form-group">
+              <label class="nx-label">Password</label>
+              <input type="password" id="woo-admin-password" class="nx-input">
+            </div>
           </div>
+        </div>
+        
+        <!-- Advanced Options Toggle -->
+        <div class="nx-advanced-toggle" id="advanced-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+          Advanced options
+        </div>
+        
+        <!-- Advanced Options (hidden by default) -->
+        <div id="advanced-options" style="display:none;">
+          <!-- Add advanced options here if needed -->
         </div>
         
         <!-- Common Form Elements -->
@@ -286,6 +387,44 @@
       document.getElementById("woo-form").style.display = tab === 'woo' ? 'block' : 'none';
     }
     
+    // Toggle between API and admin login fields
+    document.querySelector('input[name="shopify-auth-type"]').addEventListener('change', function() {
+      toggleAuthFields('shopify');
+    });
+    
+    document.querySelectorAll('input[name="shopify-auth-type"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        toggleAuthFields('shopify');
+      });
+    });
+    
+    document.querySelectorAll('input[name="woo-auth-type"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        toggleAuthFields('woo');
+      });
+    });
+    
+    function toggleAuthFields(platform) {
+      const authType = document.querySelector(`input[name="${platform}-auth-type"]:checked`).value;
+      
+      if (platform === 'shopify') {
+        document.getElementById('shopify-api-fields').style.display = authType === 'api' ? 'block' : 'none';
+        document.getElementById('shopify-admin-fields').style.display = authType === 'admin' ? 'block' : 'none';
+      } else {
+        document.getElementById('woo-api-fields').style.display = authType === 'api' ? 'block' : 'none';
+        document.getElementById('woo-admin-fields').style.display = authType === 'admin' ? 'block' : 'none';
+      }
+    }
+    
+    // Toggle advanced options
+    document.getElementById('advanced-toggle').addEventListener('click', function() {
+      const advancedOptions = document.getElementById('advanced-options');
+      const isOpen = advancedOptions.style.display === 'block';
+      
+      advancedOptions.style.display = isOpen ? 'none' : 'block';
+      this.className = isOpen ? 'nx-advanced-toggle' : 'nx-advanced-toggle open';
+    });
+    
     // Get URL parameters
     function getUrlParams() {
       const params = {};
@@ -307,15 +446,49 @@
     
     // Handle form submission
     document.getElementById("submit-btn").addEventListener("click", function() {
-      // Validate form
+      // Get active tab and auth type
       let activeTab = document.getElementById("shopify-tab").className.includes("active") ? 'shopify' : 'woo';
-      let isValid = true;
+      let authType = document.querySelector(`input[name="${activeTab}-auth-type"]:checked`).value;
       
       // Show loading state
       const button = document.getElementById("submit-btn");
       const originalText = button.textContent;
       button.textContent = "Securely Storing...";
       button.disabled = true;
+      
+      // Build credentials object based on auth type
+      let credentials = {};
+      let storeUrl = document.getElementById(`${activeTab}-url`).value;
+      
+      if (authType === 'api') {
+        if (activeTab === 'shopify') {
+          credentials = {
+            type: 'api',
+            apiKey: document.getElementById("shopify-key").value,
+            apiSecret: document.getElementById("shopify-password").value
+          };
+        } else { // WooCommerce
+          credentials = {
+            type: 'api',
+            consumerKey: document.getElementById("woo-key").value,
+            consumerSecret: document.getElementById("woo-secret").value
+          };
+        }
+      } else { // admin login
+        if (activeTab === 'shopify') {
+          credentials = {
+            type: 'admin',
+            email: document.getElementById("shopify-email").value,
+            password: document.getElementById("shopify-admin-password").value
+          };
+        } else { // WooCommerce
+          credentials = {
+            type: 'admin',
+            username: document.getElementById("woo-username").value,
+            password: document.getElementById("woo-admin-password").value
+          };
+        }
+      }
       
       // Simulated API call
       setTimeout(function() {
@@ -330,18 +503,27 @@
         
         // Clear sensitive fields
         if (activeTab === 'shopify') {
-          document.getElementById("shopify-key").value = "";
-          document.getElementById("shopify-password").value = "";
-        } else {
-          document.getElementById("woo-key").value = "";
-          document.getElementById("woo-secret").value = "";
+          if (authType === 'api') {
+            document.getElementById("shopify-key").value = "";
+            document.getElementById("shopify-password").value = "";
+          } else {
+            document.getElementById("shopify-email").value = "";
+            document.getElementById("shopify-admin-password").value = "";
+          }
+        } else { // WooCommerce
+          if (authType === 'api') {
+            document.getElementById("woo-key").value = "";
+            document.getElementById("woo-secret").value = "";
+          } else {
+            document.getElementById("woo-username").value = "";
+            document.getElementById("woo-admin-password").value = "";
+          }
         }
         
         // Show return link
         document.getElementById("return-link").style.display = "block";
         
-        // In production, you would send data to your API:
-        
+        // In production, send data to API
         fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
           method: 'POST',
           headers: {
@@ -350,25 +532,22 @@
           body: JSON.stringify({
             customerId: params.customerId,
             platform: activeTab,
-            storeUrl: document.getElementById(activeTab + "-url").value,
-            credentials: {
-              apiKey: document.getElementById(activeTab === 'shopify' ? "shopify-key" : "woo-key").value,
-              apiSecret: document.getElementById(activeTab === 'shopify' ? "shopify-password" : "woo-secret").value
-            }
+            storeUrl: storeUrl,
+            credentials: credentials
           })
         }).then(response => {
           if (!response.ok) throw new Error('Failed to store credentials');
           return response.json();
         }).then(data => {
           // Success handling
-document.getElementById("success-text").textContent = 
-  "Your " + (activeTab === 'shopify' ? 'Shopify' : 'WooCommerce') + " credentials have been securely stored.";
-document.getElementById("success-message").style.display = "flex";
-document.getElementById("return-link").style.display = "block";
+          document.getElementById("success-text").textContent = 
+            "Your " + (activeTab === 'shopify' ? 'Shopify' : 'WooCommerce') + " credentials have been securely stored.";
+          document.getElementById("success-message").style.display = "flex";
+          document.getElementById("return-link").style.display = "block";
         }).catch(error => {
           // Error handling
-console.error('Error:', error);
-alert("Error storing credentials: " + error.message);
+          console.error('Error:', error);
+          alert("Error storing credentials: " + error.message);
         });
         
       }, 1500);
