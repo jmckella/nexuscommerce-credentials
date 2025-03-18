@@ -3,163 +3,239 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexuscommerce - Secure Credentials</title>
+  <title>NexusCommerce - Secure Credentials</title>
   <style>
+    :root {
+      --nx-green: #9AFF32;
+      --nx-dark: #121212;
+      --nx-dark-secondary: #1E1E1E;
+      --nx-dark-tertiary: #2D2D2D;
+      --nx-gray: #64748b;
+      --nx-light-gray: #94A3B8;
+      --nx-white: #FFFFFF;
+      --nx-success: #22c55e;
+      --nx-warning: #f59e0b;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f7f7f7;
-      color: #333;
+      background-color: var(--nx-dark);
+      color: var(--nx-white);
       line-height: 1.6;
     }
+    
     .container {
       max-width: 550px;
       margin: 40px auto;
       padding: 0;
     }
-    .nx-container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      overflow: hidden;
+    
+    .nx-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
     }
+    
+    .nx-logo-icon {
+      background-color: var(--nx-green);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .nx-logo-text {
+      font-weight: 600;
+      font-size: 18px;
+      color: var(--nx-white);
+    }
+    
+    .nx-container {
+      background: var(--nx-dark-secondary);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--nx-dark-tertiary);
+    }
+    
     .nx-header {
       padding: 24px;
-      background: #f9f9f9;
-      border-bottom: 1px solid #eee;
+      background: var(--nx-dark-tertiary);
+      border-bottom: 1px solid #333;
     }
+    
     .nx-header-title {
       display: flex;
       align-items: center;
       margin-bottom: 8px;
     }
+    
     .nx-platform-badge {
-      background: #22c55e;
-      color: white;
+      background: var(--nx-green);
+      color: var(--nx-dark);
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 4px 8px;
       border-radius: 4px;
       margin-left: 10px;
     }
+    
     .nx-future-platforms {
       font-size: 12px;
-      color: #64748b;
+      color: var(--nx-light-gray);
       margin-top: 5px;
       display: flex;
       align-items: center;
     }
+    
     .nx-future-platforms svg {
       margin-right: 5px;
     }
+    
     .nx-body {
       padding: 24px;
     }
+    
     .nx-form-group {
       margin-bottom: 20px;
       position: relative;
     }
+    
     .nx-label {
       display: flex;
       align-items: center;
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 8px;
+      color: var(--nx-white);
     }
+    
     .nx-input {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ddd;
+      padding: 12px;
+      background-color: var(--nx-dark-tertiary);
+      border: 1px solid #444;
       border-radius: 6px;
       font-size: 14px;
       box-sizing: border-box;
       transition: border-color 0.2s ease;
+      color: var(--nx-white);
     }
+    
     .nx-input:focus {
       outline: none;
-      border-color: #22c55e;
-      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+      border-color: var(--nx-green);
+      box-shadow: 0 0 0 2px rgba(154, 255, 50, 0.2);
     }
+    
+    .nx-input::placeholder {
+      color: var(--nx-gray);
+    }
+    
     .nx-alert {
       padding: 16px;
-      background: #fffbeb;
-      border: 1px solid #fef3c7;
+      background: rgba(154, 255, 50, 0.1);
+      border: 1px solid rgba(154, 255, 50, 0.2);
       border-radius: 6px;
       margin-bottom: 20px;
       display: flex;
       align-items: flex-start;
     }
+    
     .nx-alert-icon {
       margin-right: 12px;
       flex-shrink: 0;
       margin-top: 2px;
+      color: var(--nx-green);
     }
+    
     .nx-alert-text {
       font-size: 14px;
-      color: #92400e;
+      color: var(--nx-light-gray);
     }
+    
     .nx-radio-group {
       margin-bottom: 20px;
     }
+    
     .nx-radio-option {
       display: flex;
       align-items: flex-start;
       margin-bottom: 12px;
     }
+    
     .nx-radio {
       margin-right: 10px;
       margin-top: 3px;
+      accent-color: var(--nx-green);
     }
+    
     .nx-radio-label {
       font-size: 14px;
       font-weight: 500;
+      color: var(--nx-white);
     }
+    
     .nx-checkbox-group {
       display: flex;
       margin: 24px 0;
     }
+    
     .nx-checkbox {
       margin-right: 10px;
       margin-top: 3px;
+      accent-color: var(--nx-green);
     }
+    
     .nx-btn {
       width: 100%;
       padding: 12px 16px;
-      background: #22c55e;
-      color: white;
+      background: var(--nx-green);
+      color: var(--nx-dark);
       border: none;
       border-radius: 6px;
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
     }
+    
     .nx-btn:hover {
-      background: #16a34a;
+      background: #8CE82D;
+      transform: translateY(-1px);
     }
+    
     .nx-btn:focus {
       outline: none;
-      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+      box-shadow: 0 0 0 2px rgba(154, 255, 50, 0.3);
     }
+    
     .nx-success {
       margin-top: 20px;
       padding: 16px;
-      background: #dcfce7;
-      border: 1px solid #86efac;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
       border-radius: 6px;
       display: flex;
       align-items: flex-start;
     }
+    
     .nx-success-icon {
       margin-right: 12px;
       flex-shrink: 0;
       margin-top: 2px;
+      color: var(--nx-success);
     }
+    
     .nx-success-text {
       font-size: 14px;
-      color: #166534;
+      color: #22c55e;
     }
+    
     .help-icon {
       display: inline-flex;
       align-items: center;
@@ -167,17 +243,20 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #e2e8f0;
-      color: #64748b;
+      background: #333;
+      color: var(--nx-light-gray);
       font-size: 10px;
       font-weight: bold;
       margin-left: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
+    
     .help-icon:hover {
-      background: #cbd5e1;
+      background: #444;
+      color: var(--nx-white);
     }
+    
     .tooltip-overlay {
       display: none;
       position: fixed;
@@ -185,33 +264,37 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.7);
       z-index: 5;
     }
+    
     .tooltip {
       position: absolute;
       z-index: 10;
       width: 320px;
       max-height: 380px;
       overflow-y: auto;
-      background: white;
+      background: var(--nx-dark-secondary);
       border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
       padding: 16px;
       font-size: 13px;
-      color: #475569;
+      color: var(--nx-light-gray);
       display: none;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #333;
     }
+    
     .tooltip.visible {
       display: block;
     }
+    
     /* Position tooltips more strategically */
     .store-url-help .tooltip {
       top: 100%;
       left: 0;
       margin-top: 8px;
     }
+    
     .api-key-help .tooltip,
     .api-password-help .tooltip {
       top: 50%;
@@ -219,35 +302,43 @@
       transform: translate(-50%, -50%);
       position: fixed;
     }
+    
     .email-help .tooltip {
       top: 100%;
       right: 0;
       margin-top: 8px;
     }
+    
     .tooltip-title {
       font-weight: 600;
       margin-bottom: 10px;
-      color: #22c55e;
+      color: var(--nx-green);
       font-size: 15px;
       padding-right: 20px;
     }
+    
     .tooltip-steps {
       margin: 0;
       padding-left: 18px;
+      color: var(--nx-light-gray);
     }
+    
     .tooltip-steps li {
       margin-bottom: 8px;
     }
+    
     .tooltip-steps li:last-child {
       margin-bottom: 0;
     }
+    
     .tooltip-support {
       margin-top: 16px;
       padding-top: 12px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #333;
       font-size: 12px;
-      color: #64748b;
+      color: var(--nx-gray);
     }
+    
     .tooltip-close {
       position: absolute;
       top: 12px;
@@ -258,24 +349,38 @@
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      background: #f1f5f9;
+      background: #333;
       border: none;
       cursor: pointer;
-      color: #64748b;
+      color: var(--nx-light-gray);
       font-size: 12px;
       font-weight: bold;
       transition: all 0.2s ease;
     }
+    
     .tooltip-close:hover {
-      background: #e2e8f0;
-      color: #475569;
+      background: #444;
+      color: var(--nx-white);
     }
+    
+    #return-link a {
+      color: var(--nx-green);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    #return-link a:hover {
+      text-decoration: underline;
+    }
+    
     /* Responsive adjustment */
     @media (max-width: 600px) {
       .container {
         margin: 20px auto;
         padding: 0 20px;
       }
+      
       .tooltip {
         width: 280px;
         max-width: 90vw;
@@ -285,6 +390,20 @@
 </head>
 <body>
   <div class="container">
+    <!-- Logo -->
+    <div class="nx-logo">
+      <div class="nx-logo-icon">
+        <svg width="24" height="24" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M132.351 62.5H125.184L117.5 93.75H58.75V187.5H151.184L191.25 147.434V93.75H132.351V62.5Z" fill="transparent" stroke="black" stroke-width="10"/>
+          <circle cx="58.75" cy="140.625" r="15.625" fill="black"/>
+          <circle cx="125" cy="62.5" r="15.625" fill="black"/>
+          <circle cx="125" cy="187.5" r="15.625" fill="black"/>
+          <circle cx="191.25" cy="140.625" r="15.625" fill="black"/>
+        </svg>
+      </div>
+      <div class="nx-logo-text">Nexus Commerce</div>
+    </div>
+    
     <div class="nx-container">
       <!-- Header -->
       <div class="nx-header">
@@ -296,7 +415,7 @@
           <h2 style="margin:0;font-size:20px;">Provide Access to Your Store</h2>
           <div class="nx-platform-badge">Shopify</div>
         </div>
-        <p style="margin:5px 0 0;font-size:14px;color:#666;">Your credentials are encrypted and securely stored using industry best practices.</p>
+        <p style="margin:5px 0 0;font-size:14px;color:var(--nx-light-gray);">Your credentials are encrypted and securely stored using industry best practices.</p>
         <div class="nx-future-platforms">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
@@ -436,8 +555,8 @@
         <div class="nx-checkbox-group">
           <input type="checkbox" id="terms" class="nx-checkbox">
           <div>
-            <label for="terms" style="font-size:14px;font-weight:500;">I understand that:</label>
-            <p style="margin:2px 0 0;font-size:14px;color:#666;">Nexuscommerce will securely store these credentials to provide analytics, reporting, and optimization services.</p>
+            <label for="terms" style="font-size:14px;font-weight:500;color:var(--nx-white);">I understand that:</label>
+            <p style="margin:2px 0 0;font-size:14px;color:var(--nx-light-gray);">Nexuscommerce will securely store these credentials to provide analytics, reporting, and optimization services.</p>
           </div>
         </div>
         
@@ -455,7 +574,7 @@
         
         <!-- Return Link (hidden initially) -->
         <div id="return-link" style="text-align:center; margin-top:20px; display:none;">
-          <a href="#" id="return-to-nexus" style="color:#22c55e; text-decoration:none; font-weight:500;">Return to Nexuscommerce</a>
+          <a href="#" id="return-to-nexus">Return to Nexuscommerce</a>
         </div>
       </div>
     </div>
