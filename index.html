@@ -546,7 +546,10 @@
               We recommend using dedicated API credentials rather than your admin login.
             </span>
           </div>
-          
+          <!-- Credential Management Button (initially hidden) -->
+<div id="view-credentials" style="text-align:center; margin-bottom:24px; display:none;">
+  <button onclick="viewCredentials()" class="nx-btn" style="max-width:300px; background:#333; margin:0 auto;">View Existing Credentials</button>
+</div>
           <!-- Credential Type Selection -->
           <div class="nx-radio-group">
             <div class="nx-radio-option">
@@ -679,10 +682,7 @@
         <div id="return-link" style="text-align:center; margin-top:20px; display:none;">
           <a href="#" id="return-to-nexus">Return to Nexuscommerce</a>
         </div>
-        <!-- Credential Management Button (initially hidden) -->
-<div id="view-credentials" style="text-align:center; margin-top:20px; display:none;">
-  <button onclick="viewCredentials()" class="nx-btn" style="max-width:250px; background:#333;">View Existing Credentials</button>
-</div>
+        
       </div>
     </div>
   </div>
