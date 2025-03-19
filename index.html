@@ -1288,6 +1288,141 @@ async function deleteCredential() {
     alert('Error deleting credential: ' + (error.message || 'Unknown error'));
   }
 }
+    // Handle form submission
+document.getElementById("submit-btn").addEventListener("click", function() {
+  // Get auth type
+  const authType = document.querySelector('input[name="shopify-auth-type"]:checked').value;
+  
+  // Show loading state
+  const button = document.getElementById("submit-btn");
+  const originalText = button.textContent;
+  button.textContent = "Securely Storing...";
+  button.disabled = true;
+  
+  // Get form data
+  const storeUrl = document.getElementById("shopify-url").value;
+  
+  // Build credentials object based on auth type
+  let credentials = {};
+  
+  if (authType === 'api') {
+    credentials = {
+      type: 'api',
+      apiKey: document.getElementById("shopify-key").value,
+      apiSecret: document.getElementById("shopify-password").value
+    };
+  } else { // admin login
+    credentials = {
+      type: 'admin',
+      email: document.getElementById("shopify-email").value,
+      password: document.getElementById("shopify-admin-password").value
+    };
+  }
+  
+  // Validate form
+  let isValid = true;
+  let errorMessage = "";
+  
+  // Basic validation
+  if (!storeUrl) {
+    isValid = false;
+    errorMessage = "Please enter your store URL";
+  } else if (authType === 'api' && (!credentials.apiKey || !credentials.apiSecret)) {
+    isValid = false;
+    errorMessage = "Please enter both API Key and API Password";
+  } else if (authType === 'admin' && (!credentials.email || !credentials.password)) {
+    isValid = false;
+    errorMessage = "Please enter both Email and Password";
+  }
+  
+  if (!document.getElementById("terms").checked) {
+    isValid = false;
+    errorMessage = "Please accept the terms to continue";
+  }
+  
+  if (!isValid) {
+    alert(errorMessage);
+    button.textContent = originalText;
+    button.disabled = false;
+    return;
+  }
+  
+  // Get URL parameters
+  const params = getUrlParams();
+  
+  // Make the API call
+  fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(window.tokenData?.token ? { 'Authorization': `Bearer ${window.tokenData.token}` } : {})
+    },
+    body: JSON.stringify({
+      customerId: params.customerId,
+      platform: 'shopify',
+      storeUrl: storeUrl,
+      credentials: credentials,
+      metadata: {
+        submittedAt: new Date().toISOString(),
+        referrerUrl: params.returnUrl || 'direct'
+      }
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(data => {
+        throw new Error(data.error || 'Failed to store credentials');
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Success handling
+    document.getElementById("success-text").textContent = 
+      "Your Shopify credentials have been securely stored.";
+    document.getElementById("success-message").style.display = "flex";
+    
+    // Clear sensitive fields
+    if (authType === 'api') {
+      document.getElementById("shopify-key").value = "";
+      document.getElementById("shopify-password").value = "";
+    } else {
+      document.getElementById("shopify-email").value = "";
+      document.getElementById("shopify-admin-password").value = "";
+    }
+    
+    // Show return link and set proper URL
+    if (params.returnUrl) {
+      const returnLink = document.getElementById("return-to-nexus");
+      returnLink.href = decodeURIComponent(params.returnUrl);
+      returnLink.textContent = "Return to Nexuscommerce";
+      document.getElementById("return-link").style.display = "block";
+      
+      // Auto-redirect after 3 seconds
+      setTimeout(() => {
+        window.location.href = decodeURIComponent(params.returnUrl);
+      }, 3000);
+    } else {
+      document.getElementById("return-link").style.display = "block";
+    }
+    
+    console.log('Credentials stored successfully');
+  })
+  .catch(error => {
+    // Error handling
+    console.error('Error:', error);
+    document.getElementById("success-text").textContent = 
+      "Error storing credentials: " + error.message;
+    document.getElementById("success-message").style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+    document.getElementById("success-message").style.borderColor = "rgba(239, 68, 68, 0.2)";
+    document.getElementById("success-message").style.display = "flex";
+  })
+  .finally(() => {
+    // Reset button whether success or failure
+    button.textContent = originalText;
+    button.disabled = false;
+  });
+});
   </script>
   <!-- Credential Management Modal -->
 <div id="credential-modal" class="nx-modal" style="display:none;">
