@@ -386,6 +386,115 @@
         max-width: 90vw;
       }
     }
+    .nx-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.nx-modal-content {
+  background: var(--nx-dark-secondary);
+  border-radius: 12px;
+  max-width: 550px;
+  margin: 50px auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  overflow: hidden;
+  border: 1px solid var(--nx-dark-tertiary);
+}
+
+.nx-modal-header {
+  padding: 20px 24px;
+  background: var(--nx-dark-tertiary);
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nx-modal-title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--nx-white);
+}
+
+.nx-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--nx-light-gray);
+}
+
+.nx-modal-body {
+  padding: 24px;
+}
+
+.nx-credential-item {
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  background: var(--nx-dark-tertiary);
+}
+
+.nx-credential-item:hover {
+  border-color: var(--nx-green);
+  box-shadow: 0 2px 8px rgba(154, 255, 50, 0.1);
+}
+
+.nx-credential-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.nx-credential-platform {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--nx-white);
+}
+
+.nx-credential-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.nx-credential-action {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nx-credential-action.edit {
+  background: #333;
+  color: var(--nx-light-gray);
+}
+
+.nx-credential-action.edit:hover {
+  background: #444;
+  color: var(--nx-white);
+}
+
+.nx-credential-url {
+  font-size: 14px;
+  color: var(--nx-light-gray);
+}
+
+.nx-credential-date {
+  font-size: 12px;
+  color: var(--nx-gray);
+  margin-top: 8px;
+}
   </style>
 </head>
 <body>
@@ -570,6 +679,10 @@
         <div id="return-link" style="text-align:center; margin-top:20px; display:none;">
           <a href="#" id="return-to-nexus">Return to Nexuscommerce</a>
         </div>
+        <!-- Credential Management Button (initially hidden) -->
+<div id="view-credentials" style="text-align:center; margin-top:20px; display:none;">
+  <button onclick="viewCredentials()" class="nx-btn" style="max-width:250px; background:#333;">View Existing Credentials</button>
+</div>
       </div>
     </div>
   </div>
@@ -865,6 +978,393 @@ fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials
   button.disabled = false;
 });
     });
+    // Show access denied message
+function showAccessDenied(message) {
+  const formContainer = document.querySelector('.nx-body');
+  
+  formContainer.innerHTML = `
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 16px; display: flex; align-items: flex-start; margin-bottom: 20px;">
+      <span style="color: #ef4444; margin-right: 12px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </span>
+      <span style="color: #ef4444;">${message}</span>
+    </div>
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="nx-btn" onclick="window.close()">Return to portal</button>
+    </div>
+  `;
+}
+
+// Check token on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const tokenIsValid = verifyToken();
+  if (!tokenIsValid) {
+    console.error("Token verification failed");
+    return;
+  }
+  
+  // Check for credentials on page load
+  loadCredentialStatus();
+});
+
+// Load credential status
+async function loadCredentialStatus() {
+  const params = getUrlParams();
+  if (!params.customerId) return;
+  
+  try {
+    // Prepare API URL with appropriate authentication
+    let apiUrl;
+    if (params.token) {
+      // Secure token method
+      apiUrl = `https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials?token=${encodeURIComponent(params.token)}`;
+    } else {
+      // Legacy method (direct customerId)
+      apiUrl = `https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials?customerId=${encodeURIComponent(params.customerId)}`;
+    }
+    
+    // Make the API call to check if credentials exist
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to check credential status:', await response.text());
+      return;
+    }
+    
+    const data = await response.json();
+    
+    // If credentials exist, show the "View Existing Credentials" button
+    if (data.credentials && data.credentials.length > 0) {
+      document.getElementById('view-credentials').style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error checking credential status:', error);
+  }
+}
+
+// Show the credential management modal
+function viewCredentials() {
+  document.getElementById('credential-modal').style.display = 'block';
+  document.getElementById('credentials-loading').style.display = 'block';
+  document.getElementById('credentials-error').style.display = 'none';
+  document.getElementById('credentials-empty').style.display = 'none';
+  document.getElementById('credentials-list').style.display = 'none';
+  document.getElementById('edit-credential-form').style.display = 'none';
+  
+  loadCredentials();
+}
+
+// Close the credential management modal
+function closeCredentialModal() {
+  document.getElementById('credential-modal').style.display = 'none';
+}
+
+// Load credentials from the API
+async function loadCredentials() {
+  try {
+    const params = getUrlParams();
+    if (!params.customerId) {
+      throw new Error('No customer ID found');
+    }
+    
+    // Prepare API URL with appropriate authentication
+    let apiUrl;
+    if (params.token) {
+      // Secure token method
+      apiUrl = `https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials?token=${encodeURIComponent(params.token)}`;
+    } else {
+      // Legacy method (direct customerId)
+      apiUrl = `https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials?customerId=${encodeURIComponent(params.customerId)}`;
+    }
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to load credentials');
+    }
+    
+    const data = await response.json();
+    
+    // Hide loading indicator
+    document.getElementById('credentials-loading').style.display = 'none';
+    
+    if (!data.credentials || data.credentials.length === 0) {
+      // Show empty state
+      document.getElementById('credentials-empty').style.display = 'block';
+    } else {
+      // Render credentials
+      renderCredentialsList(data.credentials);
+      document.getElementById('credentials-list').style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error loading credentials:', error);
+    document.getElementById('credentials-loading').style.display = 'none';
+    document.getElementById('credentials-error').style.display = 'flex';
+    document.getElementById('credentials-error-text').textContent = 
+      'Error loading credentials: ' + (error.message || 'Unknown error');
+  }
+}
+
+// Render the list of credentials
+function renderCredentialsList(credentials) {
+  const listContainer = document.querySelector('.nx-credential-items');
+  listContainer.innerHTML = '';
+  
+  credentials.forEach(cred => {
+    const item = document.createElement('div');
+    item.className = 'nx-credential-item';
+    
+    // Format date
+    const updatedDate = cred.lastUpdated ? new Date(cred.lastUpdated).toLocaleDateString() : 'Unknown';
+    
+    item.innerHTML = `
+      <div class="nx-credential-header">
+        <div class="nx-credential-platform">${cred.platform.charAt(0).toUpperCase() + cred.platform.slice(1)}</div>
+        <div class="nx-credential-actions">
+          <div class="nx-credential-action edit" onclick="editCredential('${cred.name}', '${cred.platform}')">Edit</div>
+        </div>
+      </div>
+      <div class="nx-credential-url">ID: ${cred.credentialId}</div>
+      <div class="nx-credential-date">Last updated: ${updatedDate}</div>
+    `;
+    
+    listContainer.appendChild(item);
+  });
+}
+
+// Current credential being edited
+let currentCredential = null;
+
+// Show edit form for a credential
+async function editCredential(secretName, platform) {
+  try {
+    document.getElementById('credentials-list').style.display = 'none';
+    document.getElementById('credentials-loading').style.display = 'block';
+    
+    // Store the current credential for update/delete operations
+    currentCredential = {
+      secretName,
+      platform
+    };
+    
+    // Update form labels based on platform
+    if (platform.toLowerCase() === 'shopify') {
+      document.getElementById('edit-key-label').textContent = 'API Key';
+      document.getElementById('edit-secret-label').textContent = 'API Password';
+    } else {
+      document.getElementById('edit-key-label').textContent = 'API Key';
+      document.getElementById('edit-secret-label').textContent = 'API Secret';
+    }
+    
+    document.getElementById('edit-credential-title').textContent = 
+      `Update ${platform.charAt(0).toUpperCase() + platform.slice(1)} Credentials`;
+    
+    // Clear form fields
+    document.getElementById('edit-store-url').value = '';
+    document.getElementById('edit-api-key').value = '';
+    document.getElementById('edit-api-secret').value = '';
+    
+    // Hide loading and show edit form
+    document.getElementById('credentials-loading').style.display = 'none';
+    document.getElementById('edit-credential-form').style.display = 'block';
+  } catch (error) {
+    console.error('Error editing credential:', error);
+    document.getElementById('credentials-loading').style.display = 'none';
+    document.getElementById('credentials-error').style.display = 'flex';
+    document.getElementById('credentials-error-text').textContent = 
+      'Error loading credential details: ' + (error.message || 'Unknown error');
+  }
+}
+
+// Cancel editing a credential
+function cancelEditCredential() {
+  document.getElementById('edit-credential-form').style.display = 'none';
+  document.getElementById('credentials-list').style.display = 'block';
+  currentCredential = null;
+}
+
+// Save updated credential
+async function saveCredential() {
+  if (!currentCredential) return;
+  
+  try {
+    const storeUrl = document.getElementById('edit-store-url').value;
+    const apiKey = document.getElementById('edit-api-key').value;
+    const apiSecret = document.getElementById('edit-api-secret').value;
+    
+    const params = getUrlParams();
+    
+    // Only include credentials if both fields are filled
+    const updateData = {
+      secretName: currentCredential.secretName
+    };
+    
+    if (storeUrl) {
+      updateData.storeUrl = storeUrl;
+    }
+    
+    if (apiKey && apiSecret) {
+      updateData.credentials = {
+        apiKey,
+        apiSecret
+      };
+    }
+    
+    // Update the credential
+    const response = await fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(params.token ? { 'Authorization': `Bearer ${params.token}` } : {})
+      },
+      body: JSON.stringify(updateData)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update credential');
+    }
+    
+    // Reload credentials
+    document.getElementById('edit-credential-form').style.display = 'none';
+    loadCredentials();
+  } catch (error) {
+    console.error('Error updating credential:', error);
+    alert('Error updating credential: ' + (error.message || 'Unknown error'));
+  }
+}
+
+// Delete a credential
+async function deleteCredential() {
+  if (!currentCredential) return;
+  
+  // Confirm deletion
+  if (!confirm(`Are you sure you want to delete this ${currentCredential.platform} credential?`)) {
+    return;
+  }
+  
+  try {
+    const params = getUrlParams();
+    
+    // Delete the credential
+    let deleteUrl = `https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials?secretName=${encodeURIComponent(currentCredential.secretName)}`;
+    
+    // Add token or customerId based on authentication method
+    if (params.token) {
+      deleteUrl += `&token=${encodeURIComponent(params.token)}`;
+    } else {
+      deleteUrl += `&customerId=${encodeURIComponent(params.customerId)}`;
+    }
+    
+    const response = await fetch(deleteUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete credential');
+    }
+    
+    // Reload credentials
+    document.getElementById('edit-credential-form').style.display = 'none';
+    loadCredentials();
+  } catch (error) {
+    console.error('Error deleting credential:', error);
+    alert('Error deleting credential: ' + (error.message || 'Unknown error'));
+  }
+}
   </script>
+  <!-- Credential Management Modal -->
+<div id="credential-modal" class="nx-modal" style="display:none;">
+  <div class="nx-modal-content">
+    <div class="nx-modal-header">
+      <h3 class="nx-modal-title">Manage Existing Credentials</h3>
+      <button class="nx-modal-close" onclick="closeCredentialModal()">&times;</button>
+    </div>
+    <div class="nx-modal-body">
+      <div id="credentials-loading" style="text-align:center; padding:20px;">
+        <p>Loading your credentials...</p>
+      </div>
+      
+      <div id="credentials-error" class="nx-alert" style="display:none;">
+        <span class="nx-alert-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </span>
+        <span id="credentials-error-text" class="nx-alert-text">
+          An error occurred while loading your credentials.
+        </span>
+      </div>
+      
+      <div id="credentials-empty" style="text-align:center; padding:20px; display:none;">
+        <p>You don't have any stored credentials yet.</p>
+        <button class="nx-btn" style="max-width:250px; margin-top:10px;" onclick="closeCredentialModal()">Add New Credentials</button>
+      </div>
+      
+      <div id="credentials-list" style="display:none;">
+        <div class="nx-credential-items">
+          <!-- Credential items will be inserted here -->
+        </div>
+      </div>
+      
+      <!-- Edit Credential Form -->
+      <div id="edit-credential-form" style="display:none;">
+        <h4 id="edit-credential-title" style="color:var(--nx-white);">Update Credentials</h4>
+        
+        <div class="nx-form-group">
+          <label class="nx-label">Store URL</label>
+          <input type="text" id="edit-store-url" class="nx-input">
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-label" id="edit-key-label">API Key</label>
+          <input type="text" id="edit-api-key" class="nx-input">
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-label" id="edit-secret-label">API Secret</label>
+          <input type="password" id="edit-api-secret" class="nx-input">
+        </div>
+        
+        <div class="nx-alert" style="margin-top:20px;">
+          <span class="nx-alert-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </span>
+          <span class="nx-alert-text">
+            Leave fields empty to keep existing credentials.
+          </span>
+        </div>
+        
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button class="nx-btn" style="background:#ef4444; max-width:120px;" onclick="deleteCredential()">Delete</button>
+          <button class="nx-btn" style="background:#333; max-width:120px;" onclick="cancelEditCredential()">Cancel</button>
+          <button class="nx-btn" style="max-width:120px;" onclick="saveCredential()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
