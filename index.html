@@ -704,56 +704,77 @@
       }
       
       // Simulated API call
-      setTimeout(function() {
-        // Show success message
-        document.getElementById("success-text").textContent = 
-          "Your Shopify credentials have been securely stored.";
-        document.getElementById("success-message").style.display = "flex";
-        
-        // Reset button
-        button.textContent = originalText;
-        button.disabled = false;
-        
-        // Clear sensitive fields
-        if (authType === 'api') {
-          document.getElementById("shopify-key").value = "";
-          document.getElementById("shopify-password").value = "";
-        } else {
-          document.getElementById("shopify-email").value = "";
-          document.getElementById("shopify-admin-password").value = "";
-        }
-        
-        // Show return link
-        document.getElementById("return-link").style.display = "block";
-        
-        // In production, send data to API
-        fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            customerId: params.customerId,
-            platform: 'shopify',
-            storeUrl: storeUrl,
-            credentials: credentials
-          })
-        }).then(response => {
-          if (!response.ok) throw new Error('Failed to store credentials');
-          return response.json();
-        }).then(data => {
-          // Success handling
-          document.getElementById("success-text").textContent = 
-            "Your Shopify credentials have been securely stored.";
-          document.getElementById("success-message").style.display = "flex";
-          document.getElementById("return-link").style.display = "block";
-        }).catch(error => {
-          // Error handling
-          console.error('Error:', error);
-          alert("Error storing credentials: " + error.message);
-        });
-        
-      }, 1500);
+// 1. The getUrlParams() function is already in your code, which is good!
+
+// 2. Update the return link section - replace the setTimeout function in the form submission
+// Find this section in your code and replace it:
+
+setTimeout(function() {
+  // Show success message
+  document.getElementById("success-text").textContent = 
+    "Your Shopify credentials have been securely stored.";
+  document.getElementById("success-message").style.display = "flex";
+  
+  // Reset button
+  button.textContent = originalText;
+  button.disabled = false;
+  
+  // Clear sensitive fields
+  if (authType === 'api') {
+    document.getElementById("shopify-key").value = "";
+    document.getElementById("shopify-password").value = "";
+  } else {
+    document.getElementById("shopify-email").value = "";
+    document.getElementById("shopify-admin-password").value = "";
+  }
+  
+  // Show return link and set proper URL
+  if (params.returnUrl) {
+    const returnLink = document.getElementById("return-to-nexus");
+    returnLink.href = decodeURIComponent(params.returnUrl);
+    returnLink.textContent = "Return to Nexuscommerce";
+    document.getElementById("return-link").style.display = "block";
+    
+    // Auto-redirect after 3 seconds
+    setTimeout(() => {
+      window.location.href = decodeURIComponent(params.returnUrl);
+    }, 3000);
+  } else {
+    document.getElementById("return-link").style.display = "block";
+  }
+  
+  // Send data to API with customerId
+  fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      customerId: params.customerId,
+      platform: 'shopify',
+      storeUrl: storeUrl,
+      credentials: credentials,
+      metadata: {
+        submittedAt: new Date().toISOString(),
+        referrerUrl: params.returnUrl || 'direct'
+      }
+    })
+  }).then(response => {
+    if (!response.ok) throw new Error('Failed to store credentials');
+    return response.json();
+  }).then(data => {
+    // Success already handled above
+    console.log('Credentials stored successfully');
+  }).catch(error => {
+    // Error handling
+    console.error('Error:', error);
+    document.getElementById("success-text").textContent = 
+      "Error storing credentials: " + error.message;
+    document.getElementById("success-message").style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+    document.getElementById("success-message").style.borderColor = "rgba(239, 68, 68, 0.2)";
+  });
+  
+}, 1500);
     });
   </script>
 </body>
