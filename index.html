@@ -582,13 +582,55 @@
 function verifyToken() {
   const params = getUrlParams();
   
+  // Check for token parameter (new secure method)
+  const token = new URLSearchParams(window.location.search).get('token');
+  
+  // If token exists, verify and extract data
+  if (token) {
+    try {
+      // Parse the token (client-side validation only)
+      const [payloadBase64, signature] = token.split('.');
+      
+      if (!payloadBase64 || !signature) {
+        showAccessDenied("Invalid token format");
+        return false;
+      }
+      
+      // Decode the payload
+      const payloadStr = atob(payloadBase64);
+      const payload = JSON.parse(payloadStr);
+      
+      // Check if token is expired
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp < now) {
+        showAccessDenied("This link has expired. Please request a new credential link.");
+        return false;
+      }
+      
+      // Store token data for later use
+      window.tokenData = {
+        customerId: payload.customerId,
+        returnUrl: payload.returnUrl,
+        token: token
+      };
+      
+      console.log("Running with valid token authentication");
+      return true;
+    } catch (error) {
+      console.error("Token parsing error:", error);
+      showAccessDenied("Invalid token. Please request a new credential link.");
+      return false;
+    }
+  }
+  
   // For initial deployment without tokens, allow access
-  // Remove this condition when you implement token generation
+  // This is your existing compatibility mode
   if (!params.expiresAt && !params.signature) {
     console.log("Running in compatibility mode without token verification");
     return true;
   }
   
+  // Your existing verification code for the current URL parameter method
   // Check if all required parameters are present
   if (!params.customerId || !params.expiresAt || !params.signature) {
     showAccessDenied("Invalid access link. Missing required parameters.");
@@ -603,7 +645,6 @@ function verifyToken() {
   }
   
   // Verify signature (this is a simplified version matching what's in the button code)
-  // In production, this should use a proper HMAC verification with a shared secret
   const expectedSignature = btoa(`${params.customerId}:${params.expiresAt}:nexuscommerce-secret`);
   
   if (params.signature !== expectedSignature) {
@@ -613,40 +654,6 @@ function verifyToken() {
   
   // All checks passed
   return true;
-}
-
-// Show access denied message
-function showAccessDenied(message) {
-  document.addEventListener('DOMContentLoaded', function() {
-    const formContainer = document.querySelector('.nx-body');
-    
-    formContainer.innerHTML = `
-      <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 16px; display: flex; align-items: flex-start; margin-bottom: 20px;">
-        <span style="color: #ef4444; margin-right: 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-        </span>
-        <span style="color: #ef4444;">${message}</span>
-      </div>
-      <div style="text-align: center; margin-top: 20px;">
-        <button class="nx-btn" onclick="window.close()">Return to portal</button>
-      </div>
-    `;
-  });
-}
-
-// Function to get URL parameters - not needed since you already have this function
-// Just make sure it appears before the verification code calls it
-
-// Check token on page load - must run before other code
-const tokenIsValid = verifyToken();
-if (!tokenIsValid) {
-  console.error("Token verification failed");
-  // The rest of the script won't execute meaningfully if verification fails
-  // as the showAccessDenied function will replace the page content
 }
     // Toggle between API and admin login fields
     document.querySelectorAll('input[name="shopify-auth-type"]').forEach(radio => {
@@ -727,51 +734,28 @@ if (!tokenIsValid) {
     
     // Get URL parameters
     function getUrlParams() {
-      const params = {};
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      
-      // Get customer ID and return URL
-      params.customerId = urlParams.get('customerId') || 'unknown';
-      params.returnUrl = urlParams.get('returnUrl') || null;
-      
-      return params;
-    }
-    
-    // Set up return link if provided
-    const params = getUrlParams();
-    if (params.returnUrl) {
-      document.getElementById("return-to-nexus").href = decodeURIComponent(params.returnUrl);
-    }
-    
-    // Handle form submission
-    document.getElementById("submit-btn").addEventListener("click", function() {
-      // Get auth type
-      let authType = document.querySelector('input[name="shopify-auth-type"]:checked').value;
-      
-      // Show loading state
-      const button = document.getElementById("submit-btn");
-      const originalText = button.textContent;
-      button.textContent = "Securely Storing...";
-      button.disabled = true;
-      
-      // Build credentials object based on auth type
-      let credentials = {};
-      let storeUrl = document.getElementById("shopify-url").value;
-      
-      if (authType === 'api') {
-        credentials = {
-          type: 'api',
-          apiKey: document.getElementById("shopify-key").value,
-          apiSecret: document.getElementById("shopify-password").value
-        };
-      } else { // admin login
-        credentials = {
-          type: 'admin',
-          email: document.getElementById("shopify-email").value,
-          password: document.getElementById("shopify-admin-password").value
-        };
-      }
+  // If we have token data from verification, use that first
+  if (window.tokenData) {
+    return {
+      customerId: window.tokenData.customerId,
+      returnUrl: window.tokenData.returnUrl,
+      token: window.tokenData.token
+    };
+  }
+  
+  // Legacy fallback
+  const params = {};
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  
+  // Get customer ID and return URL
+  params.customerId = urlParams.get('customerId') || 'unknown';
+  params.returnUrl = urlParams.get('returnUrl') || null;
+  params.expiresAt = urlParams.get('expiresAt');
+  params.signature = urlParams.get('signature');
+  
+  return params;
+}
       
       // Simulated API call
 // 1. The getUrlParams() function is already in your code, which is good!
