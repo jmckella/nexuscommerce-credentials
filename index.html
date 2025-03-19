@@ -796,8 +796,9 @@ if (!isValid) {
 fetch('https://2qqns62uhf.execute-api.us-east-2.amazonaws.com/Deploy/credentials', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json',
-  },
+  'Content-Type': 'application/json',
+  ...(window.tokenData?.token ? { 'Authorization': `Bearer ${window.tokenData.token}` } : {})
+},
   body: JSON.stringify({
     customerId: params.customerId,
     platform: 'shopify',
