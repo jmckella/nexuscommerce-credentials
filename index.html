@@ -578,6 +578,76 @@
   <div class="tooltip-overlay" id="tooltip-overlay"></div>
 
   <script>
+    // Verify the token before allowing access
+function verifyToken() {
+  const params = getUrlParams();
+  
+  // For initial deployment without tokens, allow access
+  // Remove this condition when you implement token generation
+  if (!params.expiresAt && !params.signature) {
+    console.log("Running in compatibility mode without token verification");
+    return true;
+  }
+  
+  // Check if all required parameters are present
+  if (!params.customerId || !params.expiresAt || !params.signature) {
+    showAccessDenied("Invalid access link. Missing required parameters.");
+    return false;
+  }
+  
+  // Check if token is expired
+  const now = Date.now();
+  if (now > parseInt(params.expiresAt)) {
+    showAccessDenied("Your access link has expired. Please return to the portal and try again.");
+    return false;
+  }
+  
+  // Verify signature (this is a simplified version matching what's in the button code)
+  // In production, this should use a proper HMAC verification with a shared secret
+  const expectedSignature = btoa(`${params.customerId}:${params.expiresAt}:nexuscommerce-secret`);
+  
+  if (params.signature !== expectedSignature) {
+    showAccessDenied("Invalid access signature. Please return to the portal and try again.");
+    return false;
+  }
+  
+  // All checks passed
+  return true;
+}
+
+// Show access denied message
+function showAccessDenied(message) {
+  document.addEventListener('DOMContentLoaded', function() {
+    const formContainer = document.querySelector('.nx-body');
+    
+    formContainer.innerHTML = `
+      <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 16px; display: flex; align-items: flex-start; margin-bottom: 20px;">
+        <span style="color: #ef4444; margin-right: 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </span>
+        <span style="color: #ef4444;">${message}</span>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <button class="nx-btn" onclick="window.close()">Return to portal</button>
+      </div>
+    `;
+  });
+}
+
+// Function to get URL parameters - not needed since you already have this function
+// Just make sure it appears before the verification code calls it
+
+// Check token on page load - must run before other code
+const tokenIsValid = verifyToken();
+if (!tokenIsValid) {
+  console.error("Token verification failed");
+  // The rest of the script won't execute meaningfully if verification fails
+  // as the showAccessDenied function will replace the page content
+}
     // Toggle between API and admin login fields
     document.querySelectorAll('input[name="shopify-auth-type"]').forEach(radio => {
       radio.addEventListener('change', function() {
